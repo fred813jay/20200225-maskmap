@@ -9,24 +9,36 @@
               .flex-fill
                 select#cityName.form-control(
                     v-model="select.city",
-                    @change="removeMarker(); updateMap()")
+                    @change="select.area = ''")
                   option(value="") --Select One--
                   option(:value="c.CityName",v-for="c in cityName",:key="c.CityName") {{c.CityName}}
             .form-group.d-flex
               label.mr-2.col-form-label.text-right(for='area') 地區
               .flex-fill
-                select#area.form-control
+                select#area.form-control(
+                    v-model="select.area", v-if="select.city.length"
+                    @change="removeMarker(); updateMap()")
                   option(value='') -- Select One --
-            p.mb-0.small.text-muted.text-right 請先選擇區域查看（綠色表示還有口罩）
+                  option(:value="a.AreaName",
+                      v-for="a in cityName.find((city) => city.CityName === select.city).AreaList",
+                         :key="a.AreaName") {{a.AreaName}}
+            p.mb-0.small.text-muted.text-right 選擇區域查看（綠色表示兩種口罩尚有庫存）
           ul.list-group
-            template
-              a.list-group-item.text-left
-                h3 藥局名稱
+            template(v-for="(item, key) in data",
+                  v-if='item.properties.county === select.city\
+                  && item.properties.town === select.area')
+              a.list-group-item.text-left(:key='key',
+                  v-if='item.properties.county === select.city\
+                  && item.properties.town === select.area',
+                  :class="{ 'highlight': item.properties.mask_adult >0\
+                            && item.properties.mask_child >0 }",
+                  @click='penTo(item)')
+                h3 {{item.properties.name}}
                 p.mb-0
-                  | 成人口罩：1 | 兒童口罩：2
-              p.mb-0
-                a.list-group-item.text-left 地址：
-                  a(href='https://www.google.com.tw/maps/place/...', target='_blank', title='Google Map') 地址
+                  | 成人口罩：{{item.properties.mask_adult}} | 兒童口罩：{{item.properties.mask_child}}
+                  p(:class="{ 'highlight': item.properties.mask_adult >0\
+                            && item.properties.mask_child >0 }") 地址：
+                    a(:href='`https://www.google.com.tw/maps/place/${item.properties.address}`', target='_blank', title='Google Map') {{item.properties.address}}
       .col-sm-9
         #map
 
@@ -41,7 +53,22 @@ import cityName from './assets/cityName.json';
 
 let osmMap = {};
 
-// console.log(L);
+const iconsConfig = {
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+};
+const icons = {
+  green: new L.Icon({
+    iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+    ...iconsConfig,
+  }),
+  grey: new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+    ...iconsConfig,
+  }),
+};
 
 export default {
   name: 'App',
@@ -50,18 +77,32 @@ export default {
     cityName,
     select: {
       city: '臺北市',
+      area: '中正區',
     },
   }),
+  // watch: {
+  //   select: {
+  //     handler() {
+  //       this.select.area = cityName.find((city) => (
+  //         city.CityName === this.select.city).AreaList[0].AreaName);
+  //     },
+  //     deep: true,
+  //   },
+  // },
   methods: {
     updateMap() {
       const pharmacies = this.data.filter((pharmacy) => (
-        pharmacy.properties.county === this.select.city));
+        pharmacy.properties.county === this.select.city)
+        && (pharmacy.properties.town === this.select.area));
+
       pharmacies.forEach((pharmacy) => {
         const { properties, geometry } = pharmacy;
+        const icon = properties.mask_adult > 0
+        && properties.mask_child > 0 ? icons.green : icons.grey;
         L.marker([
           geometry.coordinates[1],
           geometry.coordinates[0],
-        ]).addTo(osmMap).bindPopup(`
+        ], { icon }).addTo(osmMap).bindPopup(`
          <H6><strong>${properties.name}</strong></H6>  
          口罩數量：<strong>
          成人 - ${properties.mask_adult ? `${properties.mask_adult} 個` : '無庫存'}/ 
@@ -82,8 +123,7 @@ export default {
     },
     // 選擇地區後將地圖中心點帶入座標
     penTo(item) {
-      const { properties, geometry } = item;
-      console.log(properties);
+      const { geometry } = item;
       osmMap.panTo([geometry.coordinates[1], geometry.coordinates[0]]);
     },
   },
