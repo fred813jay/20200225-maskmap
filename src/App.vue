@@ -38,7 +38,8 @@
                   | 成人口罩：{{item.properties.mask_adult}} | 兒童口罩：{{item.properties.mask_child}}
                   p(:class="{ 'highlight': item.properties.mask_adult >0\
                             && item.properties.mask_child >0 }") 地址：
-                    a(:href='`https://www.google.com.tw/maps/place/${item.properties.address}`', target='_blank', title='Google Map') {{item.properties.address}}
+                    a(:href='`https://www.google.com.tw/maps/place/${item.properties.address}`',
+                      target='_blank', title='Google Map') {{item.properties.address}}
       .col-sm-9
         #map
 
