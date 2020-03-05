@@ -41,6 +41,7 @@
                           && item.properties.mask_child >0 }") 地址：
                   a(:href='`https://www.google.com.tw/maps/place/${item.properties.address}`',
                     target='_blank', title='Google Map') {{item.properties.address}}
+                p.mb-0 備註： {{item.properties.note}}
       .col-sm-9
         #map
 
@@ -110,7 +111,9 @@ export default {
          成人 - ${properties.mask_adult ? `${properties.mask_adult} 個` : '無庫存'}/ 
          兒童 - ${properties.mask_child ? `${properties.mask_child} 個` : '無庫存'}</strong><br/>    
          地址: <a href="https://www.google.com.tw/maps/place/${properties.address}" target="_blank">${properties.address}</a><br/>    
-         電話: ${properties.phone}<br/><small>最後更新時間: ${properties.updated}</small>
+         電話: ${properties.phone}<br/>
+         備註: ${properties.note}<br/>
+         <small>最後更新時間: ${properties.updated}</small><br/>
           `);
       });
       this.penTo(pharmacies[0]);
@@ -138,7 +141,9 @@ export default {
         成人 - ${properties.mask_adult ? `${properties.mask_adult} 個` : '無庫存'}/ 
         兒童 - ${properties.mask_child ? `${properties.mask_child} 個` : '無庫存'}</strong><br/>    
         地址: <a href="https://www.google.com.tw/maps/place/${properties.address}" target="_blank">${properties.address}</a><br/>    
-        電話: ${properties.phone}<br/><small>最後更新時間: ${properties.updated}</small>
+        電話: ${properties.phone}<br/>
+        備註: ${properties.note}<br/>
+        <small>最後更新時間: ${properties.updated}</small><br/>
         `).openPopup();
     },
   },
