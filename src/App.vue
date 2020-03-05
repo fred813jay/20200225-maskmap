@@ -22,7 +22,7 @@
                   option(:value="a.AreaName",
                       v-for="a in cityName.find((city) => city.CityName === select.city).AreaList",
                          :key="a.AreaName") {{a.AreaName}}
-            p.mb-0.small.text-muted.text-right 選擇區域查看（綠色表示兩種口罩尚有庫存）
+            p.mb-0.small.text-muted.text-left 選擇區域查看（綠色表示兩種口罩尚有庫存）
           ul.list-group
             template(v-for="(item, key) in data",
                   v-if='item.properties.county === select.city\
@@ -36,10 +36,11 @@
                 h3 {{item.properties.name}}
                 p.mb-0
                   | 成人口罩：{{item.properties.mask_adult}} | 兒童口罩：{{item.properties.mask_child}}
-                  p(:class="{ 'highlight': item.properties.mask_adult >0\
-                            && item.properties.mask_child >0 }") 地址：
-                    a(:href='`https://www.google.com.tw/maps/place/${item.properties.address}`',
-                      target='_blank', title='Google Map') {{item.properties.address}}
+                p.mb-0 電話： {{item.properties.phone}}
+                p.mb-0(:class="{ 'highlight': item.properties.mask_adult >0\
+                          && item.properties.mask_child >0 }") 地址：
+                  a(:href='`https://www.google.com.tw/maps/place/${item.properties.address}`',
+                    target='_blank', title='Google Map') {{item.properties.address}}
       .col-sm-9
         #map
 
