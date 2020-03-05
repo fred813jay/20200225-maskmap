@@ -125,8 +125,21 @@ export default {
     },
     // 選擇地區後將地圖中心點帶入座標
     penTo(item) {
-      const { geometry } = item;
+      const { properties, geometry } = item;
       osmMap.panTo([geometry.coordinates[1], geometry.coordinates[0]]);
+      const icon = properties.mask_adult > 0
+      && properties.mask_child > 0 ? icons.green : icons.grey;
+      L.marker([
+        geometry.coordinates[1],
+        geometry.coordinates[0],
+      ], { icon }).addTo(osmMap).bindPopup(`
+        <H6><strong>${properties.name}</strong></H6>  
+        口罩數量：<strong>
+        成人 - ${properties.mask_adult ? `${properties.mask_adult} 個` : '無庫存'}/ 
+        兒童 - ${properties.mask_child ? `${properties.mask_child} 個` : '無庫存'}</strong><br/>    
+        地址: <a href="https://www.google.com.tw/maps/place/${properties.address}" target="_blank">${properties.address}</a><br/>    
+        電話: ${properties.phone}<br/><small>最後更新時間: ${properties.updated}</small>
+        `).openPopup();
     },
   },
   mounted() {
