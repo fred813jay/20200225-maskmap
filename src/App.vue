@@ -41,14 +41,13 @@
                           && item.properties.mask_child >0 }") 地址：
                   a(:href='`https://www.google.com.tw/maps/place/${item.properties.address}`',
                     target='_blank', title='Google Map') {{item.properties.address}}
-                p.mb-0 備註： {{item.properties.note}}
+                p.mb-0(v-if="item.properties.note.length > 1") 備註： {{item.properties.note}}
+                p.mb-0(v-if="item.properties.custom_note.length > 1")
+                  | 注意事項: {{item.properties.custom_note}}
       .col-sm-9
         #map
 
 </template>
-
-// https://github.com/Wcc723/wheremask/tree/master/src
-// https://paper.dropbox.com/doc/2020-0213-2XPGbqH5JqE9vTD7a6npd
 
 <script>
 import L from 'leaflet';
@@ -113,6 +112,7 @@ export default {
          地址: <a href="https://www.google.com.tw/maps/place/${properties.address}" target="_blank">${properties.address}</a><br/>    
          電話: ${properties.phone}<br/>
          備註: ${properties.note}<br/>
+         注意事項: ${properties.custom_note}<br/>
          <small>最後更新時間: ${properties.updated}</small><br/>
           `);
       });
@@ -143,6 +143,7 @@ export default {
         地址: <a href="https://www.google.com.tw/maps/place/${properties.address}" target="_blank">${properties.address}</a><br/>    
         電話: ${properties.phone}<br/>
         備註: ${properties.note}<br/>
+        注意事項: ${properties.custom_note}<br/>
         <small>最後更新時間: ${properties.updated}</small><br/>
         `).openPopup();
     },
